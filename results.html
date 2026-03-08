@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="ranjit.css">
+  <title>Available Buses</title>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand"><span class="logo">🚌</span> Available Buses</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card pop">
+    <div class="head">
+      <h3 id="searchInfo">Available Buses</h3>
+    </div>
+    <div class="body">
+      <div class="routes" id="routeList"></div>
+    </div>
+  </section>
+</main>
+
+<script src="script.js"></script>
+<script>
+  const from = localStorage.getItem("searchFrom");
+  const to = localStorage.getItem("searchTo");
+  const date = localStorage.getItem("searchDate");
+
+  document.getElementById("searchInfo").innerText = 
+    `Buses from ${from} ➝ ${to} on ${date}`;
+
+  const filtered = sampleRoutes.filter(r => 
+    r.from.toLowerCase() === from.toLowerCase() &&
+    r.to.toLowerCase() === to.toLowerCase()
+  );
+
+  const routeList = document.getElementById("routeList");
+
+ routeList.innerHTML = filtered.map(r => `
+  <div class="route">
+    <div class="top"><strong>${r.operator}</strong> <span class="price">₹${r.price}</span></div>
+    <div class="meta">${r.from} → ${r.to} | ${r.type}</div>
+    <div class="meta">Departure: ${r.depart} | Arrival: ${r.arrive}</div>
+    <div class="meta">Rating: ⭐ ${r.rating}</div>
+
+    <div class="actions-row" style="margin-top:10px;">
+      <button class="btn primary" onclick='selectBus(${JSON.stringify(r)})'>Select Seats</button>
+
+    </div>
+  </div>
+`).join("");
+function selectBus(bus){
+  localStorage.setItem("selectedBus", JSON.stringify(bus));
+  window.location.href = "seats.html";
+}
+
+
+</script>
+
+</body>
+</html>

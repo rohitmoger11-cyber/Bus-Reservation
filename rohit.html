@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bus Reservation • Modern UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="ranjit.css" />
+</head>
+<body>
+  <!-- 🔹 HEADER -->
+  <header>
+    <div class="nav">
+      <div class="brand"><span class="logo">🚌</span> Bus Reservation</div>
+      <div class="actions">
+        <button class="btn" id="themeToggle" title="Toggle theme">🌙</button>
+
+        <!-- 🔹 Create Account button (shown when NOT logged in) -->
+        <button
+          class="btn primary"
+          id="createAccountBtn"
+          onclick="window.location.href='signup.html'">
+          Create Account
+        </button>
+
+        <!-- 🔹 User info + Logout (shown when logged in) -->
+        <span id="userEmail" style="margin-right: 8px; font-size: 14px;"></span>
+        <button class="btn" id="logoutBtn">Logout</button>
+
+        <button class="btn primary"
+          onclick="document.getElementById('results').scrollIntoView({behavior:'smooth'})">
+          Find Buses
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <!-- Booking Card -->
+      <div class="card pop">
+        <div class="head"><h3>Book Your Trip</h3><span class="pill">Book • Tickets</span></div>
+        <div class="body">
+          <div class="grid">
+            <div>
+              <label>From</label>
+              <input id="from" type="text" placeholder="Select from City" list="cityListFrom" />
+              <datalist id="cityListFrom">
+                <option value="Bengaluru">
+                <option value="Mangaluru">
+                <option value="Udupi">
+                <option value="Karwar">
+                <option value="Shivamogga">
+                <option value="Hubballi">
+                <option value="Mysuru">
+                <option value="Hassan">
+                <option value="Dharwad">
+                <option value="Belagavi">
+              </datalist>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>To</label>
+              <input id="to" type="text" placeholder="Select City" list="cityListTo" />
+              <datalist id="cityListTo">
+                <option value="Bengaluru">
+                <option value="Mangaluru">
+                <option value="Udupi">
+                <option value="Karwar">
+                <option value="Shivamogga">
+                <option value="Hubballi">
+                <option value="Mysuru">
+                <option value="Hassan">
+                <option value="Dharwad">
+                <option value="Belagavi">
+              </datalist>
+            </div>
+          </div>
+
+          <div class="grid grid-3">
+            <div>
+              <label>Bus Type</label>
+              <select id="busType">
+                <option value="Sleeper">Sleeper</option>
+                <option value="Semi-Sleeper">Semi-Sleeper</option>
+                <option value="AC">AC</option>
+                <option value="Non-AC">Non-AC</option>
+              </select>
+            </div>
+            <div>
+              <label>Date</label>
+              <input id="date" type="date" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn primary" id="searchBtn">Search Buses</button>
+            </div>
+          </div>
+          <div class="actions-row">
+            <button class="btn" id="clearBtn">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Highlight / Tips Card -->
+      <div class="card pop">
+        <div class="head"><h3>Why ride with us?</h3></div>
+        <div class="body">
+          <div class="route" style="margin-bottom:12px">
+            <div class="top"><span class="pill">Comfort</span><span class="price">Clean & Spacious</span></div>
+            <div class="meta">Blankets • USB • Bottled Water</div>
+          </div>
+          <div class="route" style="margin-bottom:12px">
+            <div class="top"><span class="pill">Safety</span><span class="price">Verified Drivers</span></div>
+            <div class="meta">GPS • SOS • Live Tracking</div>
+          </div>
+          <div class="route">
+            <div class="top"><span class="pill">Support</span><span class="price">24×7 Helpdesk</span></div>
+            <div class="meta">Free reschedule within policy</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Results -->
+    <section id="results" class="card pop" style="margin-top:20px;">
+      <div class="head"><h3>Available Buses</h3><span class="pill" id="resultCount">0 found</span></div>
+      <div class="body">
+        <div class="routes" id="routes"></div>
+      </div>
+    </section>
+
+    <!-- Bookings Table -->
+    <section class="card pop" style="margin-top:20px;">
+      <div class="head"><h3>Your Bookings</h3></div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr>
+              <th>From</th><th>To</th><th>Type</th><th>Date</th><th>Seats</th><th>Fare</th>
+            </tr>
+          </thead>
+          <tbody id="ticketTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="dialog pop">
+      <div class="dialog-head">
+        <strong>Confirm Booking</strong>
+        <button class="btn" id="closeModal">✕</button>
+      </div>
+      <div class="dialog-body" id="modalBody"></div>
+      <div class="dialog-actions">
+        <button class="btn" id="cancelBtn">Cancel</button>
+        <button class="btn primary" id="confirmBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">✅ Booking confirmed!</div>
+
+  <!-- Your main JS -->
+  <script src="script.js"></script>
+
+  <!-- 🔹 AUTH GUARD + LOGOUT (localStorage based) -->
+  <script>
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userEmailSpan = document.getElementById("userEmail");
+    const createAccountBtn = document.getElementById("createAccountBtn");
+
+    // Read logged-in user from localStorage (set in login.html)
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (!loggedInUser) {
+      // Not logged in → send to login page
+      if (userEmailSpan) userEmailSpan.textContent = "";
+      if (logoutBtn) logoutBtn.style.display = "none";
+      if (createAccountBtn) createAccountBtn.style.display = "inline-block";
+
+      window.location.href = "login.html";
+    } else {
+      // Logged in → show user info, hide Create Account
+      const displayName = loggedInUser.name || loggedInUser.email || "User";
+      if (userEmailSpan) userEmailSpan.textContent = "Hi, " + displayName;
+      if (logoutBtn) logoutBtn.style.display = "inline-block";
+      if (createAccountBtn) createAccountBtn.style.display = "none";
+    }
+
+    // Logout handler
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("loggedInUser");
+        alert("You have been logged out.");
+        window.location.href = "login.html";
+      });
+    }
+  </script>
+</body>
+</html>

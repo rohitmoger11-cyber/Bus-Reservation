@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="ranjit.css">
+  <title>Select Seats</title>
+
+<style>
+  .layout-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  padding-top: 25px;
+}
+
+.deck-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  padding: 18px 25px;
+  border-radius: 14px;
+  min-width: 260px;
+  text-align: center;
+}
+
+
+.bus-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.seat {
+  width: 75px;
+  height: 95px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
+  border: 2px solid #555c78;
+  background: #1b253b;
+  transition: 0.2s;
+}
+
+.aisle {
+  width: 35px;
+}
+
+
+.seat {
+  width:75px; 
+  height:95px; 
+  border-radius:10px; 
+  display:flex;
+  flex-direction: column;
+  align-items:center; 
+  justify-content:flex-end;
+  cursor:pointer; 
+  border:2px solid #555c78;
+  background:#1b253b;
+  position:relative;
+  transition:0.2s;
+}
+
+.seat .icon-person { 
+  font-size: 18px; 
+  margin-top:8px;
+  margin-bottom:auto;
+}
+
+.seat .price-tag { 
+  font-size: 14px; 
+  margin-bottom:6px;
+}
+
+.seat.selected {
+  background:#7aa2ff;
+  border-color:#5072ff;
+  color:black;
+  font-weight:600;
+}
+
+.seat.sold {
+  background:#3d4458;
+  border-color:#666;
+  cursor:not-allowed;
+  color:#aaa;
+}
+
+/* Create empty space for aisle */
+.aisle {
+  width:20px;
+  height:90px;
+}
+
+</style>
+
+
+  
+</head>
+
+<body>
+  <script type="module">
+  import { auth } from "./firebase.js";
+  import { onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      // ❌ user not logged in → send to login page
+      window.location.href = "login.html";
+    }
+  });
+</script>
+
+
+<header>
+  <div class="nav">
+    <div class="brand"><span class="logo">🚌</span> Select Seats</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <h2 id="busInfo"></h2>
+
+  <!-- Seat grid -->
+ <div class="layout-wrapper">
+
+  <div class="deck">
+    <h3>Lower Deck</h3>
+    <div class="bus-layout" id="lowerDeck"></div>
+  </div>
+
+  <div class="deck">
+    <h3>Upper Deck</h3>
+    <div class="bus-layout" id="upperDeck"></div>
+  </div>
+
+</div>
+
+
+
+  <div class="actions-row" style="margin-top:25px;">
+    <button class="btn primary" id="confirmSeatsBtn">Confirm Seats</button>
+  </div>
+</main>
+<script>
+  const bus = JSON.parse(localStorage.getItem("selectedBus"));
+  document.getElementById("busInfo").innerText = `${bus.operator} | ${bus.from} → ${bus.to}`;
+
+  let selectedSeats = [];
+  const price = bus.price || 650;
+
+  const soldSeats = ["L4", "L8", "U3"];
+
+  const lowerDeck = document.getElementById("lowerDeck");
+  const upperDeck = document.getElementById("upperDeck");
+
+  function createSeat(id){
+    const seat = document.createElement("div");
+    seat.className = "seat";
+    if(soldSeats.includes(id)) seat.classList.add("sold");
+
+    seat.innerHTML = `
+      <div style="margin-top:8px;">👤</div>
+      <div style="font-size:14px;">₹${price}</div>
+      <div style="margin-bottom:6px;">${id}</div>
+    `;
+
+    seat.onclick = () => {
+      if(seat.classList.contains("sold")) return;
+      seat.classList.toggle("selected");
+      selectedSeats.includes(id)
+        ? selectedSeats = selectedSeats.filter(s => s !== id)
+        : selectedSeats.push(id);
+    };
+
+    return seat;
+  }
+
+  function addRow(deck, a, b, c){
+    const row = document.createElement("div");
+    row.className = "row";
+
+    row.appendChild(createSeat(a));
+    row.appendChild(createSeat(b));
+
+    const aisle = document.createElement("div");
+    aisle.className = "aisle";
+    row.appendChild(aisle);
+
+    row.appendChild(createSeat(c));
+
+    deck.appendChild(row);
+  }
+
+  // Lower Deck (L1-L18 → 6 rows)
+  let seat = 1;
+  for(let i=0;i<6;i++){
+    addRow(lowerDeck, `L${seat++}`, `L${seat++}`, `L${seat++}`);
+  }
+
+  // Upper Deck (U1-U18 → 6 rows)
+  seat = 1;
+  for(let i=0;i<6;i++){
+    addRow(upperDeck, `U${seat++}`, `U${seat++}`, `U${seat++}`);
+  }
+
+  document.getElementById("confirmSeatsBtn").onclick = () => {
+    if(selectedSeats.length === 0){
+      alert("⚠ Select at least one seat!");
+      return;
+    }
+    localStorage.setItem("selectedSeats", JSON.stringify(selectedSeats));
+    window.location.href = "passenger.html";
+  };
+</script>
+
+
+
+    
+  
+
+
+
+</body>
+</html>

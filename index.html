@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bus Reservation</title>
+</head>
+<body>
+
+<script>
+  // Check login status from LocalStorage
+  const loggedInUser = localStorage.getItem("loggedInUser");
+
+  if (loggedInUser) {
+    // User already logged in
+    window.location.replace("rohit.html");
+  } else {
+    // New user or not logged in
+    window.location.replace("signup.html");
+  }
+</script>
+
+</body>
+</html>
